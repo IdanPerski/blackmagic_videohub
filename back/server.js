@@ -28,7 +28,6 @@ app.get("/", (req, res) => {
 
 // Handle socket connections
 io.on("connection", (socket) => {
-  socket;
   console.log(colors.danger("A client connected"));
 
   // Handle disconnections
@@ -38,7 +37,7 @@ io.on("connection", (socket) => {
 
   // Handle custom events from the client
   socket.on("clientEvent", (data) => {
-    console.log(colors.danger("Received data from client:", data));
+    console.log(colors.danger("Received data from client:"), data);
     // Do something with the received data
   });
 });
