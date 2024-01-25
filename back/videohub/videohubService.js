@@ -1,34 +1,47 @@
 const net = require("net");
-const colors = require("../helpers/chalk/color");
-const VIDEOHUB_IP_ADDRESS = "192.168.200.20";
-const VIDEOHUB_PORT = 9990;
+const txtColor = require("../helpers/chalk/color");
+const videohub = new net.Socket();
+const TCP_PORT = 9990;
+const TCP_HOST = "192.168.200.20";
+let videohubData;
+const handleTcpConnection = (ioSocket) => {
+  console.log("handleTcpConnection is runing");
 
-const videohubClient = new net.Socket();
+  const videohubUpdate = (tcp_client) => {
+    tcp_client.on("data", (data) => {
+      if (data.length === 27) {
+        console.log(
+          txtColor.lemon("videohub routing updated", data.toString())
+        );
+        ioSocket.emit("videoHubRoute", data);
+        return;
+      }
+      videoHubData = data;
+      console.log(txtColor.safe("videohub data sended to client"));
+      ioSocket.emit("videoHubData", data);
+    });
+  };
 
-videohubClient.connect(
-  { port: VIDEOHUB_PORT, host: VIDEOHUB_IP_ADDRESS },
-  () => {
-    console.log(colors.safe("Connected to Videohub Server"));
-  },
-);
+  videohub.on("error", (error) => {
+    console.log(txtColor.danger("ERROR:"), error);
+    if (error.code === "ETIMEDOUT") {
+      console.log(
+        txtColor.danger(
+          `Connection timed out. Check your network connection ${TCP_HOST}:${TCP_PORT}`
+        )
+      );
+    }
+    handleTcpConnection(ioSocket);
+  });
+  videohub.connect(TCP_PORT, TCP_HOST, () => {
+    console.log(txtColor.lemon(`connected to ${TCP_HOST}:${TCP_PORT}`));
 
-const getVideohubData = (callback) => {
-  videohubClient.on("data", (data) => {
-    const videohubData = data.toString();
-    callback(videohubData);
+    videohubUpdate(videohub);
+    //transfer videohub data thru socket io
+    ioSocket.on("connection", (socket) => {
+      socket.emit("videoHubData", videoHubData);
+    });
   });
 };
-// const handleVideohubData = (data) => {
-//   // Use the parsed data or perform other actions
-//   console.log("Received data:", data);
-// };
 
-// const parseVideohubData = () => {
-//   const data = getVideohubData();
-//   //   const lines = data.split("\n");
-//   //   lines.forEach((line) => {
-//   //     // Process each line
-//   //   });
-// };
-
-module.exports = getVideohubData;
+module.exports = handleTcpConnection;

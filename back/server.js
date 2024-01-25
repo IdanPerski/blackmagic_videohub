@@ -1,17 +1,11 @@
 const express = require("express");
 const cors = require("./middlewares/cors");
 const txtColor = require("./helpers/chalk/color");
-const getVideohubData = require("./videohub/videohubService");
-const colors = require("./helpers/chalk/color");
-const parseVideohubData = require("./videohub/helpers/parseVideohubData");
-const { Server } = require("socket.io");
 const { createServer } = require("http");
 const socketIo = require("socket.io");
-const fs = require("fs");
 const path = require("path");
-const customSocket = require("./socket_io/customSocket");
-
-const PORT = 8080;
+const handleTcpConnection = require("./videohub/videohubService");
+const HTTP_PORT = 8080;
 
 const app = express();
 app.use(express.static("public"));
@@ -26,29 +20,31 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
+//Handle tcp socket and socket io to client
+handleTcpConnection(io);
+
+httpServer.listen(HTTP_PORT, () => {
+  console.log(txtColor.lemon(`Server is listening on port ${HTTP_PORT}`));
+});
+
 // Handle socket connections
+
+// console.log("videohubdata", videohubData);
+
 io.on("connection", (socket) => {
-  console.log(colors.danger("A client connected"));
+  // io.emit("videohubData", videohubData);
+  // console.log(txtColor.green("socket:"), socket);
+  console.log(txtColor.safe("client connected"));
 
   // Handle disconnections
   socket.on("disconnect", () => {
-    console.log(colors.danger("A client disconnected"));
+    console.log(txtColor.danger("A client disconnected"));
   });
 
   // Handle custom events from the client
-  socket.on("clientEvent", (data) => {
-    console.log(colors.danger("Received data from client:"), data);
+  socket.on("sigleRouth", (data) => {
+    console.log(txtColor.danger("Received data from client:"), data);
+    console.log(data.command);
     // Do something with the received data
   });
-});
-// customSocket(io);
-
-getVideohubData((data) => {
-  console.log(colors.lemon("current video hub data:", "data"));
-  const parsedData = parseVideohubData(data);
-  io.emit("videohubData", parsedData);
-});
-
-httpServer.listen(PORT, () => {
-  console.log(txtColor.lemon(`Server is listening on port ${PORT}`));
 });
