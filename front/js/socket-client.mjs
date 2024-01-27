@@ -23,13 +23,11 @@ const serverSocket = (socket) => {
 
   const takeButton = document.querySelector("#takeButton");
   takeButton.addEventListener("click", () => {
-    console.log("!");
     socket.emit("sigleRouth", {
       user: 123,
       command: sendRoutingCommand("2", "8"),
       time: Date(),
     });
-    console.log("!");
   });
   socket.on("videoHubRoute", (route) => {
     const videoHubRoute = parseVideohubData(decoder.decode(route));

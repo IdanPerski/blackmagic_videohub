@@ -16,9 +16,9 @@ const io = socketIo(httpServer);
 // Serve the index.html file
 app.use(express.static(path.join(__dirname, "../front")));
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+// app.get("/", (req, res) => {
+//   res.sendFile(path.join(__dirname, "index.html"));
+// });
 
 //Handle tcp socket and socket io to client
 handleTcpConnection(io);
