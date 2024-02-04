@@ -61,7 +61,9 @@ const serverSocket = (socket) => {
     console.log("sync clicked!@!@!");
     hostIpAddress = hostIpAddress.value;
     port = port.value;
+
     const host = { hostIpAddress, port };
+    console.log(host);
     socket.emit("sync", host);
   });
 
