@@ -1,9 +1,20 @@
 import addDataToClient from "./addDataToClient.mjs";
 import parseVideohubData from "./parseVideohubData.mjs";
 import { sendRoutingCommand } from "./videohubCommand.mjs";
-const decoder = new TextDecoder("utf-8");
+import createRoutingCommand from "./createRoutngCommand.mjs";
 
+let selectedSrcAndDst = createRoutingCommand();
+
+const decoder = new TextDecoder("utf-8");
+let videohubData;
+console.log("!!!");
+const syncBtn = document.querySelector("#connectButton");
+let hostIpAddress = document.querySelector("#hostIpAddress");
+let port = document.querySelector("#port");
 const serverSocket = (socket) => {
+  // socket.on("redirect", (url) => {
+  //   window.location.href = url;
+  // });
   socket.on("videoHubData", (data) => {
     const decodedText = decoder.decode(data);
     console.log(decodedText);
@@ -12,8 +23,13 @@ const serverSocket = (socket) => {
       return;
     }
 
-    const videohubData = parseVideohubData(decodedText);
+    videohubData = parseVideohubData(decodedText);
     console.log("videohubdata:", videohubData);
+    if (videohubData) {
+      syncBtn.classList.add("d-none");
+    } else {
+      syncBtn.classList.remove("d-none");
+    }
     addDataToClient(videohubData);
   });
 
@@ -23,17 +39,40 @@ const serverSocket = (socket) => {
 
   const takeButton = document.querySelector("#takeButton");
   takeButton.addEventListener("click", () => {
-    console.log("!");
+    console.log(selectedSrcAndDst);
+    const source = selectedSrcAndDst.src.slice(3);
+    const destenation = selectedSrcAndDst.dst;
+    console.log(source, destenation[0].slice(3));
     socket.emit("sigleRouth", {
       user: 123,
-      command: sendRoutingCommand("2", "8"),
+      command: sendRoutingCommand(
+        String(Number(destenation[0].slice(3)) - 1),
+        String(Number(source) - 1),
+      ),
       time: Date(),
     });
-    console.log("!");
   });
   socket.on("videoHubRoute", (route) => {
     const videoHubRoute = parseVideohubData(decoder.decode(route));
     console.log(videoHubRoute);
+  });
+
+  syncBtn.addEventListener("click", (e) => {
+    console.log("sync clicked!@!@!");
+    hostIpAddress = hostIpAddress.value;
+    port = port.value;
+    const host = { hostIpAddress, port };
+    socket.emit("sync", host);
+  });
+
+  socket.on("VideohubTimeout", (error) => {
+    console.log("videohub timeout connection :", error);
+    const mainContainer = document.querySelector("#mainContainer");
+    mainContainer.innerHTML += `<div>can't reach ${error.address}:${error.port} , check your connection<div> `;
+
+    socket.emit("end");
+    socket.disconnect();
+    console.log("connection ended");
   });
 
   // Emit a custom event from the client to the server

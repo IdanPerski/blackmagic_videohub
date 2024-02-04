@@ -13,8 +13,20 @@
 
 <body>
 
-  <div class="container-fluid">
+  <div class="container-fluid" id="mainContainer">
     <h1 class="text-center">Videohub Controller</h1>
+    <!-- <div class="row w-75 m-auto justify-content-center ">
+      <input type="text" class=" col-sm-5">
+      <button type="button" class="btn btn-success col-sm-1 " id="connectButton">Sync</button>
+
+    </div> -->
+
+    <div class="input-group mb-3 row w-75 m-auto justify-content-center ">
+      <input type="text" class="form-control col-sm-4" placeholder=" Host IP address" aria-label=" Host IP address"
+        aria-describedby="button-addon2" id="hostIpAddress">
+      <input type="text" class="form-control col-sm-1" placeholder=" Port" aria-label=" Port" id="port">
+      <button class="btn btn-outline-success col-sm-2 " type="button" id="connectButton">Sync</button>
+    </div>
 
     <div class="row">
 
@@ -22,7 +34,7 @@
         <label for="input">Select Destenation:</label>
 
         <div class="list-group" id="dstList">
-         
+
 
 
         </div>
@@ -32,8 +44,8 @@
       <div class="col-sm-4 m-auto p-2 ">
         <label for="input">Select Source:</label>
         <div class="list-group" id="srcList">
-    
-       
+
+
 
         </div>
 
@@ -43,8 +55,8 @@
     </div>
 
     <div class="row">
-  
-      <button type="button" class="btn btn-warning col-sm-2 m-auto mt-3" id="takeButton">Take</button>
+
+      <input type="button" class="btn btn-warning col-sm-2 m-auto mt-3" id="takeButton" value="Take"></input>
 
     </div>
 

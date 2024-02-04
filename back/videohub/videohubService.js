@@ -4,20 +4,20 @@ const videohub = new net.Socket();
 const TCP_PORT = 9990;
 const TCP_HOST = "192.168.200.20";
 let videohubData;
-const handleTcpConnection = (ioSocket) => {
+const handleTcpConnection = (ioSocket, host, port) => {
   console.log("handleTcpConnection is runing");
 
   const videohubUpdate = (tcp_client) => {
     tcp_client.on("data", (data) => {
       if (data.length === 27) {
         console.log(
-          txtColor.lemon("videohub routing updated", data.toString())
+          txtColor.lemon("videohub routing updated", data.toString()),
         );
         ioSocket.emit("videoHubRoute", data);
         return;
       }
       videoHubData = data;
-      console.log(txtColor.safe("videohub data sended to client"));
+      console.log(txtColor.safe("videohub data sent to client"));
       ioSocket.emit("videoHubData", data);
     });
   };
@@ -27,14 +27,23 @@ const handleTcpConnection = (ioSocket) => {
     if (error.code === "ETIMEDOUT") {
       console.log(
         txtColor.danger(
-          `Connection timed out. Check your network connection ${TCP_HOST}:${TCP_PORT}`
-        )
+          `Connection timed out. Check your network connection ${host}:${port}`,
+        ),
       );
+      ioSocket.on("end", function () {
+        ioSocket.disconnect(0);
+      });
+      ioSocket.emit("VideohubTimeout", error);
+    } else if (error.code === "EINVAL") {
+      console.log(txtColor.danger("Invalid argument error"));
+      videohub.destroy();
+      console.log("DISCONNECTED!!!!!!");
+      // ioSocket.close();
+      // ioSocket.disconnectSockets();
     }
-    handleTcpConnection(ioSocket);
   });
-  videohub.connect(TCP_PORT, TCP_HOST, () => {
-    console.log(txtColor.lemon(`connected to ${TCP_HOST}:${TCP_PORT}`));
+  videohub.connect(port, host, () => {
+    console.log(txtColor.lemon(`connected to ${host}:${port}`));
 
     videohubUpdate(videohub);
     //transfer videohub data thru socket io
