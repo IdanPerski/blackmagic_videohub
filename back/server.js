@@ -4,7 +4,12 @@ const txtColor = require("./helpers/chalk/color");
 const { createServer } = require("http");
 const socketIo = require("socket.io");
 const path = require("path");
-const handleTcpConnection = require("./videohub/videohubService");
+const {
+  handleTcpConnection,
+  routeFromClient,
+} = require("./videohub/videohubService");
+// const handleTcpConnection = require("./videohub/videohubService");
+// const routeFromClient = require("./videohub/videohubService");
 const HTTP_PORT = 8080;
 
 const app = express();
@@ -24,11 +29,8 @@ httpServer.listen(HTTP_PORT, () => {
 
 // Handle socket connections
 
-// console.log("videohubdata", videohubData);
 const ioSocketConnection = () => {
   io.on("connection", (socket) => {
-    // io.emit("videohubData", videohubData);
-    // console.log(txtColor.green("socket:"), socket);
     console.log(txtColor.safe("client connected"));
     console.log(socket.connected);
     console.log(socket.id);
@@ -41,14 +43,17 @@ const ioSocketConnection = () => {
     });
 
     // Handle custom events from the client
-    socket.on("sigleRouth", (data) => {
+    socket.on("singleRouth", (data) => {
       console.log(txtColor.danger("Received data from client:"), data);
       console.log(data.command);
+      routeFromClient(data.command);
+      // routeFromClient(data.command);
       // Do something with the received data
     });
 
     socket.on("sync", (sync) => {
       console.log("sync clicked", sync);
+      // handleTcpConnection(io, sync.hostIpAddress, sync.port);
       handleTcpConnection(io, sync.hostIpAddress, sync.port);
     });
   });

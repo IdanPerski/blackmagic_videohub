@@ -4,19 +4,23 @@ const videohub = new net.Socket();
 const TCP_PORT = 9990;
 const TCP_HOST = "192.168.200.20";
 let videohubData;
+
 const handleTcpConnection = (ioSocket, host, port) => {
   console.log("handleTcpConnection is runing");
 
   const videohubUpdate = (tcp_client) => {
     tcp_client.on("data", (data) => {
-      if (data.length === 27) {
+      console.log(data.length, "!!!!!!!");
+      if (data.length <= 29) {
         console.log(
           txtColor.lemon("videohub routing updated", data.toString()),
         );
         ioSocket.emit("videoHubRoute", data);
         return;
       }
+
       videoHubData = data;
+      console.log(txtColor.warning(videohubData));
       console.log(txtColor.safe("videohub data sent to client"));
       ioSocket.emit("videoHubData", data);
     });
@@ -53,4 +57,12 @@ const handleTcpConnection = (ioSocket, host, port) => {
   });
 };
 
-module.exports = handleTcpConnection;
+const routeFromClient = (dataFromClient) => {
+  console.log("routeFromClient ON!", dataFromClient);
+  videohub.write(dataFromClient);
+};
+
+module.exports = {
+  handleTcpConnection: handleTcpConnection,
+  routeFromClient: routeFromClient,
+};

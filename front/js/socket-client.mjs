@@ -11,7 +11,7 @@ console.log("!!!");
 const syncBtn = document.querySelector("#connectButton");
 let hostIpAddress = document.querySelector("#hostIpAddress");
 let port = document.querySelector("#port");
-const serverSocket = (socket) => {
+const clientSocket = (socket) => {
   // socket.on("redirect", (url) => {
   //   window.location.href = url;
   // });
@@ -40,19 +40,27 @@ const serverSocket = (socket) => {
   const takeButton = document.querySelector("#takeButton");
   takeButton.addEventListener("click", () => {
     console.log(selectedSrcAndDst);
-    const source = selectedSrcAndDst.src.slice(3);
-    const destenation = selectedSrcAndDst.dst;
-    console.log(source, destenation[0].slice(3));
-    socket.emit("sigleRouth", {
-      user: 123,
-      command: sendRoutingCommand(
-        String(Number(destenation[0].slice(3)) - 1),
-        String(Number(source) - 1),
-      ),
-      time: Date(),
-    });
+    let source = selectedSrcAndDst.src.slice(3);
+    let destenation = selectedSrcAndDst.dst;
+
+    if (destenation.length === 1) {
+      destenation = String(Number(destenation[0].slice(3) - 1));
+      source = String(Number(source) - 1);
+      console.log(source, destenation);
+      socket.emit("singleRouth", {
+        user: 123,
+        command: sendRoutingCommand(destenation, source),
+        time: Date(),
+      });
+    }
+    if (destenation.length > 1) {
+      console.log("multiple destenations!");
+    }
   });
+
+  //listening to routings from the videohub
   socket.on("videoHubRoute", (route) => {
+    console.log("socket.on --->videoHubRoute");
     const videoHubRoute = parseVideohubData(decoder.decode(route));
     console.log(videoHubRoute);
   });
@@ -83,16 +91,16 @@ const serverSocket = (socket) => {
   //   console.log("Received video hub data:", data);
   // });
 
-  function emit(socket, event, arg) {
-    socket.timeout(2000).emit(event, arg, (err) => {
-      if (err) {
-        // no ack from the server, let's retry
-        emit(socket, event, arg);
-      }
-    });
-  }
+  // function emit(socket, event, arg) {
+  //   socket.timeout(2000).emit(event, arg, (err) => {
+  //     if (err) {
+  //       // no ack from the server, let's retry
+  //       emit(socket, event, arg);
+  //     }
+  //   });
+  // }
 
-  emit(socket, "foo", "bar");
+  // emit(socket, "foo", "bar");
 };
 
-export default serverSocket;
+export default clientSocket;

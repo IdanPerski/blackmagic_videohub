@@ -34,7 +34,7 @@ const createRoutngCommand = () => {
     (e) => {
       const target = e.target;
       if (target.tagName.toLowerCase() !== "li") return;
-      console.log("element clicked", target.classList);
+      // console.log("element clicked", target.classList);
       target.classList.forEach((_class) => {
         if (_class === "active") {
           target.classList.remove("active");
@@ -42,10 +42,6 @@ const createRoutngCommand = () => {
             target.id,
           );
           if (indexOfDestenationToRemove !== -1) {
-            console.log(
-              "indexOfDestenationToRemove",
-              indexOfDestenationToRemove,
-            );
             selectedSrcAndDst.dst.splice(indexOfDestenationToRemove, 1);
           }
           return;
@@ -53,7 +49,6 @@ const createRoutngCommand = () => {
           selectSingleElement(target.id, srcPattern);
           selectMultipleElements(target.id, dstPattern);
         }
-        console.log(selectedSrcAndDst);
         return selectedSrcAndDst;
       });
     },
