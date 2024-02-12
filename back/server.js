@@ -33,7 +33,7 @@ const ioSocketConnection = () => {
   io.on("connection", (socket) => {
     console.log(txtColor.safe("client connected"));
     console.log(socket.connected);
-    console.log(socket.id);
+    let sessionId = socket.id;
 
     // Handle disconnections
     socket.on("disconnect", () => {
@@ -54,7 +54,7 @@ const ioSocketConnection = () => {
     socket.on("sync", (sync) => {
       console.log("sync clicked", sync);
       // handleTcpConnection(io, sync.hostIpAddress, sync.port);
-      handleTcpConnection(io, sync.hostIpAddress, sync.port);
+      handleTcpConnection(io, sync.hostIpAddress, sync.port, sessionId);
     });
   });
 };

@@ -17,6 +17,7 @@ const addElement = (
 };
 
 export default function addDataToClient(data) {
+  console.log(data);
   if (data && data.id) {
     let sources = data.videohubInputsLabel;
     let routing = data.videOutputRouting;
@@ -39,9 +40,6 @@ export default function addDataToClient(data) {
     });
   } else {
     console.log("data is:", data);
-    console.log(
-      `need to updata that source: ${data.src} routed to destenation: ${data.dst}`
-    );
   }
 }
 

@@ -1,13 +1,13 @@
 import addDataToClient from "./addDataToClient.mjs";
 import parseVideohubData from "./parseVideohubData.mjs";
 import { sendRoutingCommand } from "./videohubCommand.mjs";
-import createRoutingCommand from "./createRoutngCommand.mjs";
+import createRoutingCommand from "./createRoutingCommand.mjs";
 
 let selectedSrcAndDst = createRoutingCommand();
 
 const decoder = new TextDecoder("utf-8");
 let videohubData;
-console.log("!!!");
+
 const syncBtn = document.querySelector("#connectButton");
 let hostIpAddress = document.querySelector("#hostIpAddress");
 let port = document.querySelector("#port");
@@ -17,14 +17,14 @@ const clientSocket = (socket) => {
   // });
   socket.on("videoHubData", (data) => {
     const decodedText = decoder.decode(data);
-    console.log(decodedText);
+    // console.log(decodedText);
     if (decodedText.slice(0, 21) === "VIDEO OUTPUT ROUTING:") {
       console.log("routingData");
       return;
     }
 
     videohubData = parseVideohubData(decodedText);
-    console.log("videohubdata:", videohubData);
+    console.log("this is videohubdata:", videohubData);
     if (videohubData) {
       syncBtn.classList.add("d-none");
     } else {
@@ -40,8 +40,8 @@ const clientSocket = (socket) => {
   const takeButton = document.querySelector("#takeButton");
   takeButton.addEventListener("click", () => {
     console.log(selectedSrcAndDst);
-    let source = selectedSrcAndDst.src.slice(3);
-    let destenation = selectedSrcAndDst.dst;
+    let source = selectedSrcAndDst?.src.slice(3);
+    let destenation = selectedSrcAndDst?.dst;
 
     if (destenation.length === 1) {
       destenation = String(Number(destenation[0].slice(3) - 1));
