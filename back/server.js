@@ -45,8 +45,6 @@ const ioSocketConnection = () => {
       console.log(data.command);
       routeFromClient(data.command);
       myLogger(socket.id, data);
-      // routeFromClient(data.command);
-      // Do something with the received data
     });
 
     socket.on("sync", (sync) => {
