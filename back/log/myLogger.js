@@ -10,7 +10,10 @@ const myLogger = async (sessionId, data) => {
   const stringToLog = ` ${data.user}, ${currentDate} ${data.command},${sessionId}`;
 
   try {
-    await fsPromises.appendFile(path.join(__dirname, "LOG.text"), stringToLog);
+    await fsPromises.appendFile(
+      path.join(__dirname, "LOG.text"),
+      stringToLog + "\n"
+    );
   } catch (error) {
     txtColor.danger(error);
   }
