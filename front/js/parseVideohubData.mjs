@@ -19,6 +19,7 @@ const findData = (findKey, afterThisString, array) => {
     return value;
   } else {
     console.log(`No line contains ${findKey}`);
+    // return
   }
 };
 

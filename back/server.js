@@ -8,8 +8,7 @@ const {
   handleTcpConnection,
   routeFromClient,
 } = require("./videohub/videohubService");
-// const handleTcpConnection = require("./videohub/videohubService");
-// const routeFromClient = require("./videohub/videohubService");
+const myLogger = require("./log/myLogger");
 const HTTP_PORT = 8080;
 
 const app = express();
@@ -20,8 +19,6 @@ const io = socketIo(httpServer);
 
 // Serve the index.html file
 app.use(express.static(path.join(__dirname, "../front")));
-//Handle tcp socket and socket io to client
-// handleTcpConnection(io);
 
 httpServer.listen(HTTP_PORT, () => {
   console.log(txtColor.lemon(`Server is listening on port ${HTTP_PORT}`));
@@ -47,6 +44,7 @@ const ioSocketConnection = () => {
       console.log(txtColor.danger("Received data from client:"), data);
       console.log(data.command);
       routeFromClient(data.command);
+      myLogger(socket.id, data);
       // routeFromClient(data.command);
       // Do something with the received data
     });
