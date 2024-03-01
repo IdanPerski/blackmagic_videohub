@@ -1,20 +1,27 @@
 const net = require("net");
 const txtColor = require("../helpers/chalk/color");
+
 const videohub = new net.Socket();
-const TCP_PORT = 9990;
-const TCP_HOST = "192.168.200.20";
+// const TCP_PORT = 9990;
+// const TCP_HOST = "192.168.200.20";
 let videohubData;
 
-const handleTcpConnection = (ioSocket, host, port) => {
+const handleTcpConnection = (ioSocket, host, port, sessionId) => {
   console.log("handleTcpConnection is runing");
+  console.log(
+    txtColor.safe(sessionId),
+    "trying to connect to:",
+    txtColor.lemon(host) + ":" + txtColor.lemon(port)
+  );
 
   const videohubUpdate = (tcp_client) => {
     tcp_client.on("data", (data) => {
-      console.log(data.length, "!!!!!!!");
+      console.log(data.length, "data.length");
       if (data.length <= 29) {
         console.log(
-          txtColor.lemon("videohub routing updated", data.toString()),
+          txtColor.lemon("videohub routing updated", data.toString())
         );
+
         ioSocket.emit("videoHubRoute", data);
         return;
       }
@@ -31,8 +38,8 @@ const handleTcpConnection = (ioSocket, host, port) => {
     if (error.code === "ETIMEDOUT") {
       console.log(
         txtColor.danger(
-          `Connection timed out. Check your network connection ${host}:${port}`,
-        ),
+          `Connection timed out. Check your network connection ${host}:${port}`
+        )
       );
       ioSocket.on("end", function () {
         ioSocket.disconnect(0);
@@ -47,7 +54,7 @@ const handleTcpConnection = (ioSocket, host, port) => {
     }
   });
   videohub.connect(port, host, () => {
-    console.log(txtColor.lemon(`connected to ${host}:${port}`));
+    console.log(txtColor.lemon(`${sessionId} connected to ${host}:${port}`));
 
     videohubUpdate(videohub);
     //transfer videohub data thru socket io

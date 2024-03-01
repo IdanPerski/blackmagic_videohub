@@ -1,8 +1,9 @@
-const createRoutngCommand = () => {
+const createRoutingCommand = () => {
   let src;
-  let dst;
+  let dst = [];
   const srcPattern = /src(?:[1-9]|[1-9][0-9]|1[0-9]{2}|2[0-8][0-8])/;
   const dstPattern = /dst(?:[1-9]|[1-9][0-9]|1[0-9]{2}|2[0-8][0-8])/;
+  let selectedSrcAndDst = { src, dst };
 
   const selectSingleElement = (id, pattern) => {
     /////create from that dynamic function!
@@ -14,8 +15,7 @@ const createRoutngCommand = () => {
         element.classList.remove("active");
       });
       document.querySelector(`#${id}`).classList.add("active");
-      console.log(`this src is ${id}`);
-      src = id;
+      selectedSrcAndDst.src = id;
     }
   };
 
@@ -23,8 +23,9 @@ const createRoutngCommand = () => {
   const selectMultipleElements = (id, pattern) => {
     if (pattern.test(id)) {
       document.querySelector(`#${id}`).classList.add("active");
-      console.log(`this dst is ${id}`);
-      dst = id;
+      if (!dst.includes(id)) {
+        dst.push(id);
+      }
     }
   };
 
@@ -32,21 +33,29 @@ const createRoutngCommand = () => {
     "click",
     (e) => {
       const target = e.target;
+      if (target.tagName.toLowerCase() !== "li") return;
+      // console.log("element clicked", target.classList);
       target.classList.forEach((_class) => {
         if (_class === "active") {
           target.classList.remove("active");
+          const indexOfDestenationToRemove = selectedSrcAndDst.dst.indexOf(
+            target.id
+          );
+          if (indexOfDestenationToRemove !== -1) {
+            selectedSrcAndDst.dst.splice(indexOfDestenationToRemove, 1);
+          }
+          return;
         } else {
           selectSingleElement(target.id, srcPattern);
           selectMultipleElements(target.id, dstPattern);
         }
-        return;
+        return selectedSrcAndDst;
       });
     },
     false
   );
-  const selectedSrcAndDst = { src, dst };
-  console.log(selectedSrcAndDst);
+
   return selectedSrcAndDst;
 };
 
-export default createRoutngCommand;
+export default createRoutingCommand;
