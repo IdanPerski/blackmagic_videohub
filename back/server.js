@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("./middlewares/cors");
 const txtColor = require("./helpers/chalk/color");
-const { createServer } = require("http");
 const socketIo = require("socket.io");
 const path = require("path");
 const {
@@ -12,17 +11,17 @@ const myLogger = require("./log/myLogger");
 const HTTP_PORT = 8080;
 
 const app = express();
-app.use(express.static("public"));
+
 app.use(cors);
-const httpServer = createServer(app);
-const io = socketIo(httpServer);
 
 // Serve the index.html file
 app.use(express.static(path.join(__dirname, "../front")));
 
-httpServer.listen(HTTP_PORT, () => {
+const expresServer = app.listen(HTTP_PORT, () => {
   console.log(txtColor.lemon(`Server is listening on port ${HTTP_PORT}`));
 });
+
+const io = socketIo(expresServer);
 
 // Handle socket connections
 
